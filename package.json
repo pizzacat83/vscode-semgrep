@@ -28,6 +28,10 @@
           "type": "webview",
           "id": "semgrep.main",
           "name": "Semgrep"
+        },
+        {
+          "id": "semgrep.result",
+          "name": "Matches"
         }
       ]
     }
