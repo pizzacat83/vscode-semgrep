@@ -10,8 +10,8 @@ import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 import { WebviewMessage } from "../messages/webview";
 
-export class MainProvider implements WebviewViewProvider {
-  public static readonly viewType = "semgrep.main";
+export class SearchProvider implements WebviewViewProvider {
+  public static readonly viewType = "semgrep.search";
 
   constructor(private readonly _extensionUri: Uri) { }
 
@@ -45,8 +45,6 @@ const getWebviewContent = (webview: Webview, extensionUri: Uri) => {
         <title>Semgrep</title>
       </head>
       <body>
-        <h1>Hello!</h1>
-
         <form id="form">
           <vscode-text-field name="pattern">Pattern</vscode-text-field>
         </form>

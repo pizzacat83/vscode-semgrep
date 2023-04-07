@@ -1,12 +1,12 @@
 import { ExtensionContext, window } from "vscode";
-import { MainProvider as MainViewProvider } from "./providers/MainViewProvider";
+import { SearchProvider } from "./providers/SearchProvider";
 import { ResultProvider } from "./providers/ResultProvider";
 
 export function activate(context: ExtensionContext) {
-	const provider = new MainViewProvider(context.extensionUri);
+	const provider = new SearchProvider(context.extensionUri);
 
 	context.subscriptions.push(window.registerWebviewViewProvider(
-		MainViewProvider.viewType,
+		SearchProvider.viewType,
 		provider,
 	));
 

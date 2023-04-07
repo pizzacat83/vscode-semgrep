@@ -26,8 +26,8 @@
       "semgrep": [
         {
           "type": "webview",
-          "id": "semgrep.main",
-          "name": "Semgrep"
+          "id": "semgrep.search",
+          "name": "Search"
         },
         {
           "id": "semgrep.result",
