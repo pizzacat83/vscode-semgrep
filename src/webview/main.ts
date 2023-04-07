@@ -13,11 +13,13 @@ window.addEventListener("load", () => {
   patternField.addEventListener("input", onInput);
 });
 
+let requestIdx = 0;
 const onInput = () => {
   const formData = new FormData(form);
 
   vscode.postMessage({
     command: "input",
+    requestIdx: ++requestIdx,
     input: formDataToInput(formData),
   } satisfies WebviewMessage);
 };
