@@ -1,17 +1,17 @@
 import { ExtensionContext, window } from "vscode";
+import { Controller } from "./controller";
 import { SearchProvider } from "./providers/SearchProvider";
-import { ResultProvider } from "./providers/ResultProvider";
 
 export function activate(context: ExtensionContext) {
-	const provider = new SearchProvider(context.extensionUri);
+	const controller = new Controller(context);
 
 	context.subscriptions.push(window.registerWebviewViewProvider(
 		SearchProvider.viewType,
-		provider,
+		controller.searchProvider,
 	));
 
 	context.subscriptions.push(window.registerTreeDataProvider(
 		'semgrep.result',
-		new ResultProvider(),
+		controller.resultProvider,
 	));
 }
