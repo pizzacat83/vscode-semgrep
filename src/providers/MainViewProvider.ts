@@ -9,6 +9,8 @@ import {
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 import { WebviewMessage } from "../messages/webview";
+import { assertUnreachable } from "../utilities/unreachable";
+import { ProviderMessage } from "../messages/provider";
 
 export class MainProvider implements WebviewViewProvider {
   public static readonly viewType = "semgrep.main";
@@ -27,7 +29,22 @@ export class MainProvider implements WebviewViewProvider {
 
     webviewView.webview.html = getWebviewContent(webviewView.webview, this._extensionUri);
 
-    webviewView.webview.onDidReceiveMessage(handleMessage);
+    webviewView.webview.onDidReceiveMessage((message: WebviewMessage) => {
+      switch (message.command) {
+        case "input": {
+          webviewView.webview.postMessage({
+            command: "search-result",
+            hits: [
+              { foo: message.input.pattern },
+            ],
+          } satisfies ProviderMessage);
+          break;
+        }
+        default: {
+          assertUnreachable(message.command);
+        }
+      }
+    });
   }
 }
 
@@ -48,22 +65,11 @@ const getWebviewContent = (webview: Webview, extensionUri: Uri) => {
         <h1>Hello!</h1>
 
         <form id="form">
-          <vscode-text-field name="pattern">Pattern</vscode-text-field>
+          <vscode-text-field id="pattern" name="pattern">Pattern</vscode-text-field>
         </form>
 
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>
     </html>
   `;
-};
-
-const handleMessage = (message: WebviewMessage) => {
-  switch (message.command) {
-    case "input": {
-      console.log("Input:", message.input);
-    }
-    default: {
-      // assertUnreachable(message.command);
-    }
-  }
 };
