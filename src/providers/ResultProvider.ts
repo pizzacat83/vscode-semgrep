@@ -1,34 +1,76 @@
 import * as vscode from 'vscode';
+import { assertUnreachable } from '../utilities/unreachable';
 
 export class ResultProvider implements vscode.TreeDataProvider<Item> {
   constructor() { }
 
   getTreeItem(element: Item): vscode.TreeItem {
-    return element;
+    switch (element.type) {
+      case "file": {
+        const item = new vscode.TreeItem(element.name, vscode.TreeItemCollapsibleState.Expanded);
+        item.description = element.path;
+        return item;
+      }
+      case "match": {
+        const item = new vscode.TreeItem({ label: element.content, highlights: element.highlights }, vscode.TreeItemCollapsibleState.None);
+        return item;
+      }
+      default: {
+        return assertUnreachable(element);
+      }
+    }
   }
 
-  async getChildren(element?: Item): Promise<Item[]> {
+  getChildren(element?: Item): Item[] {
     if (element === undefined) {
       // root element
       return [
-        new Item("Item 1", vscode.TreeItemCollapsibleState.None),
-        new Item("Item 2", vscode.TreeItemCollapsibleState.None),
-        new Item("Item 3", vscode.TreeItemCollapsibleState.None),
+        {
+          type: "file", name: "foo", path: "src/foo", matches: [
+            { type: "match", content: "const res = eval(userInput)", highlights: [[12, 27]] },
+          ]
+        },
+        {
+          type: "file", name: "bar", path: "src/bar", matches: [
+            { type: "match", content: "dangerouslySetInnerHTML(userInput);", highlights: [[0, 34]] },
+          ]
+        },
+        {
+          type: "file", name: "baz", path: "src/baz", matches: [
+            { type: "match", content: "if (hoge) nankaYabaiCode();", highlights: [[10, 26]] },
+          ]
+        },
       ];
     } else {
-      // TODO
-      return [];
+      switch (element.type) {
+        case "file": {
+          return element.matches;
+        }
+        case "match": {
+          return [];
+        }
+        default: {
+          return assertUnreachable(element);
+        }
+      }
     }
   }
 
 }
-class Item extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState
-  ) {
-    super(label, collapsibleState);
-    this.tooltip = "TODO tooltip";
-    this.description = "TODO description";
-  }
-}
+
+type Item =
+  | FileItem
+  | MatchItem;
+
+type FileItem = {
+  type: "file",
+  name: string,
+  path: string,
+  matches: MatchItem[],
+};
+
+type MatchItem = {
+  type: "match";
+  content: string;
+  highlights: [number, number][];
+};
