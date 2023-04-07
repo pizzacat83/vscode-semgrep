@@ -8,6 +8,7 @@ import {
 } from "vscode";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
+import { WebviewMessage } from "../messages/webview";
 
 export class MainProvider implements WebviewViewProvider {
   public static readonly viewType = "semgrep.main";
@@ -46,7 +47,9 @@ const getWebviewContent = (webview: Webview, extensionUri: Uri) => {
       <body>
         <h1>Hello!</h1>
 
-        <vscode-text-field id="pattern">Pattern</vscode-text-field>
+        <form id="form">
+          <vscode-text-field name="pattern">Pattern</vscode-text-field>
+        </form>
 
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>
@@ -54,13 +57,13 @@ const getWebviewContent = (webview: Webview, extensionUri: Uri) => {
   `;
 };
 
-// TODO: no-any
-const handleMessage = (message: any) => {
-  const command = message.command;
-
-  switch (command) {
+const handleMessage = (message: WebviewMessage) => {
+  switch (message.command) {
+    case "input": {
+      console.log("Input:", message.input);
+    }
     default: {
-      console.error("Unknown command:", command);
+      // assertUnreachable(message.command);
     }
   }
 };
